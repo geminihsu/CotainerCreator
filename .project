@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ContainerCreator</name>
+	<name>SpiritFitContainer</name>
 	<comment></comment>
 	<projects>
+		<project>ServerApp</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

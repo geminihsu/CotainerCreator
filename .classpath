@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="lib/okio-1.13.0.jar"/>
 	<classpathentry kind="lib" path="lib/retrofit-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/unirest-java-1.4.9.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SpiriFitAppReferenceLibrary"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
