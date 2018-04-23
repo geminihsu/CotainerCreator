@@ -308,7 +308,12 @@ public class ContainerPannel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				operator = ADD;
-				curContainers.clear();
+				
+				if(curContainers != null)
+					curContainers.clear();
+				else
+					curContainers = new ArrayList<Containerbean>();
+				
 				frame.dispose();
 				frame.setVisible(false);
 				addContainerInfo();
