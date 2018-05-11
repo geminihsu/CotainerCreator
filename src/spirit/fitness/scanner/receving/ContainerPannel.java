@@ -249,7 +249,7 @@ public class ContainerPannel implements ActionListener {
 
 					containerItems[rowIndex][1] = location.getKey();
 
-					containerItems[rowIndex][2] = qty;
+					containerItems[rowIndex][2] = qty + 1;
 
 				}
 
@@ -308,12 +308,12 @@ public class ContainerPannel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				operator = ADD;
-				
-				if(curContainers != null)
+
+				if (curContainers != null)
 					curContainers.clear();
 				else
 					curContainers = new ArrayList<Containerbean>();
-				
+
 				frame.dispose();
 				frame.setVisible(false);
 				addContainerInfo();
@@ -488,10 +488,10 @@ public class ContainerPannel implements ActionListener {
 							try {
 								loadingframe = new LoadingFrameHelper("Add data...");
 								loading = loadingframe.loadingSample("Add data...");
-							
-								if(operator == ADD)
+
+								if (operator == ADD)
 									addContainerInfo(containers);
-								else if(operator == EDIT)
+								else if (operator == EDIT)
 									updateContainerInfo(containers);
 
 							} catch (Exception e) {
@@ -564,17 +564,15 @@ public class ContainerPannel implements ActionListener {
 				loadingframe.setVisible(false);
 				loadingframe.dispose();
 
-				if(addContainerFrame != null) 
-				{
+				if (addContainerFrame != null) {
 					addContainerFrame.setVisible(false);
 					addContainerFrame.dispose();
 					addContainerFrame = null;
 				}
-				
-				
+
 				if (!items.isEmpty() && operator == EDIT)
 					JOptionPane.showMessageDialog(null, "update Data Success!");
-				
+
 				// if(frame == null)
 				containerList(items);
 				// else {
@@ -601,19 +599,18 @@ public class ContainerPannel implements ActionListener {
 
 			@Override
 			public void deleteContainerIteam(boolean result) {
-				if(result) {
-					if(frame != null) {
+				if (result) {
+					if (frame != null) {
 						frame.setVisible(false);
 						frame.dispose();
 						frame = null;
 					}
-					
+
 					JOptionPane.showMessageDialog(null, "Delete Data Success!");
 					loadContainerList();
 				}
 			}
 
-			
 		});
 
 	}
@@ -667,21 +664,21 @@ public class ContainerPannel implements ActionListener {
 			}
 		});
 	}
-		
-		private void deleteContainerInfo(Integer itemId) {
 
-			// loading model and location information from Server
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					try {
+	private void deleteContainerInfo(Integer itemId) {
 
-						containerRepositoryImplRetrofit.deleteItem(itemId);
+		// loading model and location information from Server
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
 
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					containerRepositoryImplRetrofit.deleteItem(itemId);
+
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			});
+			}
+		});
 
 	}
 
