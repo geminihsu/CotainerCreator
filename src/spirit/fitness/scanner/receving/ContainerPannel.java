@@ -51,8 +51,11 @@ import javax.swing.text.NumberFormatter;
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.model.Containerbean;
+import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.restful.ContainerRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.ContainerCallBackFunction;
+import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 
 public class ContainerPannel implements ActionListener {
@@ -71,7 +74,9 @@ public class ContainerPannel implements ActionListener {
 	private JProgressBar loading;
 
 	private ContainerRepositoryImplRetrofit containerRepositoryImplRetrofit;
+	private FGRepositoryImplRetrofit fgRepository;
 
+	private List<Containerbean> editContainers;
 	private List<Containerbean> curContainers;
 	private int operator;
 
@@ -454,53 +459,66 @@ public class ContainerPannel implements ActionListener {
 		queryButton.setBounds(250, 330, 150, 50);
 		queryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-
-				if (!snbegin.getText().toString().trim().substring(0, 6)
-						.equals(snend.getText().toString().trim().substring(0, 6)))
-					JOptionPane.showMessageDialog(null,
-							"If the container has more than one model, please create another container.");
-
-				else if (snbegin.getText().toString().trim().equals(snend.getText().toString().trim()))
-					JOptionPane.showMessageDialog(null,
-							"The SN start number the same as the end number. Please check them.");
-
-				else if (Integer.valueOf(snend.getText().toString().trim().substring(10, 16))
-						- Integer.valueOf(snbegin.getText().toString().trim().substring(10, 16)) < 0)
-					JOptionPane.showMessageDialog(null,
-							"The SN start number is smaller than SN end number. Please check them.");
-
-				else if (!dateText.getText().toString().equals("") && !containerNo.getText().toString().equals("")
+				if (!dateText.getText().toString().equals("") && !containerNo.getText().toString().equals("")
 						&& !snbegin.getText().toString().equals("") && !snend.getText().toString().equals("")
 						&& snbegin.getText().toString().trim().length() == 16
 						&& snend.getText().toString().trim().length() == 16) {
-					List<Containerbean> containers = new ArrayList<Containerbean>();
-					Containerbean container = new Containerbean();
-					container.Seq = seq;
-					container.date = dateText.getText().toString();
-					container.ContainerNo = containerNo.getText().toString().trim();
-					container.SNBegin = snbegin.getText().toString().trim();
-					container.SNEnd = snend.getText().toString().trim();
-					container.Close = false;
-					containers.add(container);
 
-					EventQueue.invokeLater(new Runnable() {
-						public void run() {
-							try {
-								loadingframe = new LoadingFrameHelper("Add data...");
-								loading = loadingframe.loadingSample("Add data...");
+					if (!snbegin.getText().toString().trim().substring(0, 6)
+							.equals(snend.getText().toString().trim().substring(0, 6)))
+						JOptionPane.showMessageDialog(null,
+								"If the container has more than one model, please create another container.");
 
-								if (operator == ADD)
-									addContainerInfo(containers);
-								else if (operator == EDIT)
-									updateContainerInfo(containers);
+					else if (snbegin.getText().toString().trim().equals(snend.getText().toString().trim()))
+						JOptionPane.showMessageDialog(null,
+								"The SN start number the same as the end number. Please check them.");
 
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
+					else if (Integer.valueOf(snend.getText().toString().trim().substring(10, 16))
+							- Integer.valueOf(snbegin.getText().toString().trim().substring(10, 16)) < 0)
+						JOptionPane.showMessageDialog(null,
+								"The SN start number is smaller than SN end number. Please check them.");
+
+					else {
+						
+						int n = JOptionPane.showConfirmDialog(
+							    frame,
+							    "Are you sure add "+containerNo.getText().toString().trim()+" to list ?",
+							    "Confirmation",
+							    JOptionPane.YES_NO_OPTION,
+					               JOptionPane.WARNING_MESSAGE);
+						
+						if(n == 0) {
+						editContainers = new ArrayList<Containerbean>();
+						Containerbean container = new Containerbean();
+						container.Seq = seq;
+						container.date = dateText.getText().toString();
+						container.ContainerNo = containerNo.getText().toString().trim();
+						container.SNBegin = snbegin.getText().toString().trim();
+						container.SNEnd = snend.getText().toString().trim();
+						container.Close = false;
+						editContainers.add(container);
+
+						// check SN exits or not
+						List<Itembean> items = new ArrayList<Itembean>();
+						Itembean snbegin = new Itembean();
+						snbegin.SN = container.SNBegin;
+						snbegin.ModelNo = snbegin.SN.substring(0, 6);
+						snbegin.Location = "000";
+						items.add(snbegin);
+
+						Itembean snend = new Itembean();
+						snend.SN = container.SNEnd;
+						snend.ModelNo = snend.SN.substring(0, 6);
+						snend.Location = "000";
+						items.add(snend);
+
+						checkItemExits(items);
 						}
-					});
+					}
+				}else
+					JOptionPane.showMessageDialog(null,
+							"Please enter correct informtaion.");
 
-				}
 			}
 		});
 		panel.add(queryButton);
@@ -522,7 +540,7 @@ public class ContainerPannel implements ActionListener {
 
 		JButton backButton = new JButton("Back");
 		backButton.setFont(font);
-		backButton.setBounds(250, 390, 150, 50);
+		backButton.setBounds(250, 390, 320, 50);
 		backButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frame.setVisible(true);
@@ -543,10 +561,62 @@ public class ContainerPannel implements ActionListener {
 		});
 
 		panel.add(backButton);
-		panel.add(exitButton);
+		//panel.add(exitButton);
 	}
 
 	private void initialCallback() {
+
+		fgRepository = new FGRepositoryImplRetrofit();
+		fgRepository.setinventoryServiceCallBackFunction(new InventoryCallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void getInventoryItems(List<Itembean> items) {
+
+			}
+
+			@Override
+			public void checkInventoryZone2Items(int result, List<Itembean> items) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void checkMoveItems(List<Itembean> items) {
+				if (items.size() == 0)
+					JOptionPane.showMessageDialog(null, "Items already exist.");
+				else {
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							try {
+								loadingframe = new LoadingFrameHelper("Add data...");
+								loading = loadingframe.loadingSample("Add data...");
+
+								if (operator == ADD)
+									addContainerInfo(editContainers);
+								else if (operator == EDIT)
+									updateContainerInfo(editContainers);
+
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					});
+
+				}
+			}
+
+			@Override
+			public void checkReceiveItem(List<Itembean> items) {
+
+			}
+		});
+
 		containerRepositoryImplRetrofit = new ContainerRepositoryImplRetrofit();
 		containerRepositoryImplRetrofit.setContainerServiceCallBackFunction(new ContainerCallBackFunction() {
 
@@ -555,7 +625,8 @@ public class ContainerPannel implements ActionListener {
 				// TODO Auto-generated method stub
 				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
 
-				}
+				} else if (code == HttpRequestCode.HTTP_REQUEST_SN_CONFLICT_ERROR)
+					JOptionPane.showMessageDialog(null, "SN already exist!");
 			}
 
 			@Override
@@ -587,13 +658,16 @@ public class ContainerPannel implements ActionListener {
 				loadingframe.setVisible(false);
 				loadingframe.dispose();
 
-				if (!items.isEmpty())
-					JOptionPane.showMessageDialog(null, "Insert Data Success!");
+				if (items == null)
+					JOptionPane.showMessageDialog(null, "SN already exist.");
+				else if (!items.isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Insert Data Success.");
 
-				loadContainerList();
-				frame = null;
-				addContainerFrame.setVisible(false);
-				addContainerFrame.dispose();
+					loadContainerList();
+					frame = null;
+					addContainerFrame.setVisible(false);
+					addContainerFrame.dispose();
+				}
 
 			}
 
@@ -680,6 +754,15 @@ public class ContainerPannel implements ActionListener {
 			}
 		});
 
+	}
+
+	private void checkItemExits(List<Itembean> items) {
+		try {
+			fgRepository.getMoveItemBySNList(items);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
