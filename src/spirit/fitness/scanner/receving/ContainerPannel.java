@@ -168,7 +168,7 @@ public class ContainerPannel implements ActionListener {
 		addContainerFrame = new JFrame("");
 		// Setting the width and height of frame
 		// scanResultFrame.setSize(600, 800);
-		addContainerFrame.setSize(600, 500);
+		addContainerFrame.setSize(600, 550);
 		addContainerFrame.setLocationRelativeTo(null);
 		addContainerFrame.setLocationRelativeTo(null);
 		addContainerFrame.setUndecorated(true);
@@ -268,7 +268,7 @@ public class ContainerPannel implements ActionListener {
 
 			final Class[] columnClass = new Class[] { String.class, String.class, String.class,Integer.class };
 
-			Object columnNames[] = { "RECEIVED DATE", "CONTAINERNO", "ModelNo", "QTY" };
+			Object columnNames[] = { "RECEIVED DATE", "CONTAINERNO", "MODELNO.", "QTY" };
 
 			DefaultTableModel container = new DefaultTableModel(containerItems, columnNames) {
 				@Override
@@ -403,8 +403,10 @@ public class ContainerPannel implements ActionListener {
 		int seq = (curContainers.isEmpty() && operator == ADD) ? 0 : curContainers.get(0).Seq;
 		String date = (curContainers.isEmpty() && operator == ADD) ? "" : curContainers.get(0).date;
 		String containerNoTxt = (curContainers.isEmpty() && operator == ADD) ? "" : curContainers.get(0).ContainerNo;
+		String model = (curContainers.isEmpty() && operator == ADD) ? "" : curContainers.get(0).ModelNo;
 		String serialNoBegin = (curContainers.isEmpty() && operator == ADD) ? "" : curContainers.get(0).SNBegin;
 		String serialNoEnd = (curContainers.isEmpty() && operator == ADD) ? "" : curContainers.get(0).SNEnd;
+		
 		
 		JLabel dateLabel = new JLabel("Received Date");
 
@@ -440,37 +442,50 @@ public class ContainerPannel implements ActionListener {
 				containerNo.requestFocus();
 			}
 		});
+		
+		JLabel modelLabel = new JLabel("Model No.");
+		modelLabel.setFont(font);
+		modelLabel.setBounds(50, 190, 200, 50);
+		panel.add(modelLabel);
+
+		JTextField snmodel = new JTextField(20);
+		snmodel.setText(model);
+		snmodel.setFont(font);
+		snmodel.setBounds(250, 190, 320, 50);
+
+		panel.add(snmodel);
 
 		JLabel snbeginLabel = new JLabel("Serial no. begin");
 		snbeginLabel.setFont(font);
-		snbeginLabel.setBounds(50, 190, 200, 50);
+		snbeginLabel.setBounds(50, 260, 200, 50);
 		panel.add(snbeginLabel);
 
 		JTextField snbegin = new JTextField(20);
 		snbegin.setText(serialNoBegin);
 		snbegin.setFont(font);
-		snbegin.setBounds(250, 190, 320, 50);
+		snbegin.setBounds(250, 260, 320, 50);
 
 		panel.add(snbegin);
 
 		JLabel snendLabel = new JLabel("Serial no. End");
 		snendLabel.setFont(font);
-		snendLabel.setBounds(50, 260, 200, 50);
+		snendLabel.setBounds(50, 340, 200, 50);
 		panel.add(snendLabel);
 
 		JTextField snend = new JTextField(20);
 		snend.setText(serialNoEnd);
 		snend.setFont(font);
-		snend.setBounds(250, 260, 320, 50);
+		snend.setBounds(250, 340, 320, 50);
 
 		panel.add(snend);
 
 		JButton queryButton = new JButton("Submit");
 		queryButton.setFont(font);
-		queryButton.setBounds(250, 330, 150, 50);
+		queryButton.setBounds(250, 400, 150, 50);
 		queryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if ( !containerNo.getText().toString().equals("")
+						&& !snmodel.getText().toString().equals("")
 						&& !snbegin.getText().toString().equals("") && !snend.getText().toString().equals("")
 						&& snbegin.getText().toString().trim().length() == 16
 						&& snend.getText().toString().trim().length() == 16) {
@@ -504,9 +519,10 @@ public class ContainerPannel implements ActionListener {
 						container.Seq = seq;
 						container.date = dateText.getText().toString();
 						container.ContainerNo = containerNo.getText().toString().trim();
+						container.ModelNo = snmodel.getText().toString().trim();
 						container.SNBegin = snbegin.getText().toString().trim();
 						container.SNEnd = snend.getText().toString().trim();
-						container.ModelNo = container.SNBegin.substring(0,6);
+						//container.ModelNo = container.SNBegin.substring(0,6);
 						container.Close = false;
 						editContainers.add(container);
 
@@ -538,7 +554,7 @@ public class ContainerPannel implements ActionListener {
 		// Creating Query button
 		JButton resetButton = new JButton("Clear");
 		resetButton.setFont(font);
-		resetButton.setBounds(420, 330, 150, 50);
+		resetButton.setBounds(420, 400, 150, 50);
 		resetButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				containerNo.setText("");
@@ -552,7 +568,7 @@ public class ContainerPannel implements ActionListener {
 
 		JButton backButton = new JButton("Back");
 		backButton.setFont(font);
-		backButton.setBounds(250, 390, 320, 50);
+		backButton.setBounds(250, 460, 320, 50);
 		backButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frame.setVisible(true);
