@@ -236,7 +236,7 @@ public class ContainerPannel implements ActionListener {
 
 			int rowIndex = 0;
 
-			final Object[][] containerItems = new Object[map.size()][3];
+			final Object[][] containerItems = new Object[map.size()][4];
 
 			for (Map.Entry<String, List<Containerbean>> location : map.entrySet()) {
 
@@ -248,22 +248,27 @@ public class ContainerPannel implements ActionListener {
 							- Integer.valueOf(list.get(0).SNBegin.substring(10, 16));
 				}
 
-				for (int j = 0; j < 3; j++) {
+				for (int j = 0; j < 4; j++) {
 
-					containerItems[rowIndex][0] = list.get(0).date.substring(0, 10);
+					String date = "";
+					if( list.get(0).date != null)
+							date = list.get(0).date.substring(0, 10);
+					containerItems[rowIndex][0] = date;
 
 					containerItems[rowIndex][1] = location.getKey();
-
-					containerItems[rowIndex][2] = qty + 1;
+					
+					containerItems[rowIndex][2] = location.getValue().get(0).ModelNo;
+					
+					containerItems[rowIndex][3] = qty + 1;
 
 				}
 
 				rowIndex++;
 			}
 
-			final Class[] columnClass = new Class[] { String.class, String.class, Integer.class };
+			final Class[] columnClass = new Class[] { String.class, String.class, String.class,Integer.class };
 
-			Object columnNames[] = { "DATE", "CONTAINERNO", "QTY" };
+			Object columnNames[] = { "RECEIVED DATE", "CONTAINERNO", "ModelNo", "QTY" };
 
 			DefaultTableModel container = new DefaultTableModel(containerItems, columnNames) {
 				@Override
@@ -291,9 +296,15 @@ public class ContainerPannel implements ActionListener {
 			TableColumn date = containerTable.getColumnModel().getColumn(0);
 			date.setCellRenderer(leftRenderer);
 			TableColumn no = containerTable.getColumnModel().getColumn(1);
+			no.setPreferredWidth(150);
 			no.setCellRenderer(leftRenderer);
-			TableColumn qty = containerTable.getColumnModel().getColumn(2);
+			
+			TableColumn model = containerTable.getColumnModel().getColumn(2);
+			model.setCellRenderer(leftRenderer);
+
+			TableColumn qty = containerTable.getColumnModel().getColumn(3);
 			qty.setCellRenderer(leftRenderer);
+			qty.setPreferredWidth(20);
 
 			int heigh = 0;
 
@@ -394,8 +405,8 @@ public class ContainerPannel implements ActionListener {
 		String containerNoTxt = (curContainers.isEmpty() && operator == ADD) ? "" : curContainers.get(0).ContainerNo;
 		String serialNoBegin = (curContainers.isEmpty() && operator == ADD) ? "" : curContainers.get(0).SNBegin;
 		String serialNoEnd = (curContainers.isEmpty() && operator == ADD) ? "" : curContainers.get(0).SNEnd;
-
-		JLabel dateLabel = new JLabel("Date");
+		
+		JLabel dateLabel = new JLabel("Received Date");
 
 		dateLabel.setBounds(50, 50, 200, 25);
 		dateLabel.setFont(font);
@@ -403,10 +414,10 @@ public class ContainerPannel implements ActionListener {
 
 		JTextField dateText = new JTextField(20);
 		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-		if (date.equals(""))
-			dateText.setText(timeStamp);
-		else
-			dateText.setText(date);
+		//if (date.equals(""))
+		//	dateText.setText(timeStamp);
+		//else
+		dateText.setText(date);
 		dateText.setFont(font);
 		dateText.setBounds(250, 50, 320, 50);
 
@@ -459,7 +470,7 @@ public class ContainerPannel implements ActionListener {
 		queryButton.setBounds(250, 330, 150, 50);
 		queryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (!dateText.getText().toString().equals("") && !containerNo.getText().toString().equals("")
+				if ( !containerNo.getText().toString().equals("")
 						&& !snbegin.getText().toString().equals("") && !snend.getText().toString().equals("")
 						&& snbegin.getText().toString().trim().length() == 16
 						&& snend.getText().toString().trim().length() == 16) {
@@ -495,6 +506,7 @@ public class ContainerPannel implements ActionListener {
 						container.ContainerNo = containerNo.getText().toString().trim();
 						container.SNBegin = snbegin.getText().toString().trim();
 						container.SNEnd = snend.getText().toString().trim();
+						container.ModelNo = container.SNBegin.substring(0,6);
 						container.Close = false;
 						editContainers.add(container);
 
@@ -615,6 +627,12 @@ public class ContainerPannel implements ActionListener {
 			public void checkReceiveItem(List<Itembean> items) {
 
 			}
+
+			@Override
+			public void exception(String error) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 
 		containerRepositoryImplRetrofit = new ContainerRepositoryImplRetrofit();
@@ -683,6 +701,12 @@ public class ContainerPannel implements ActionListener {
 					JOptionPane.showMessageDialog(null, "Delete Data Success!");
 					loadContainerList();
 				}
+			}
+
+			@Override
+			public void getContainerItemsByContainerNo(List<Containerbean> items) {
+				// TODO Auto-generated method stub
+				
 			}
 
 		});
