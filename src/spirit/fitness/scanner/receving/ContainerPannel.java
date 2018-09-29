@@ -56,7 +56,7 @@ import spirit.fitness.scanner.restful.ContainerRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.ContainerCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
-import spirit.fitness.scanner.util.LoadingFrameHelper;
+import spirit.fitness.scanner.until.LoadingFrameHelper;
 
 public class ContainerPannel implements ActionListener {
 
